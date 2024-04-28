@@ -1,12 +1,18 @@
 #pragma once
 #include <RadioLib.h>
+#include "configuration.h"
+
 
 /*!
   \class RFM95
 
   \brief Derived class for %RFM95 modules. Overrides some methods from SX1278 due to different parameter ranges.
 */
+#ifdef USE_SX1272
+class RadioLibRF95 : public SX1272
+#else
 class RadioLibRF95 : public SX1278
+#endif
 {
   public:
     // constructor

@@ -33,6 +33,16 @@
 #include <Wire.h>
 #include <memory>
 #include <utility>
+
+#ifdef PIN_NEOPIXEL
+//#define FASTLED_FORCE_SOFTWARE_SPI
+#include <FastLED.h>
+
+#define NUM_LEDS 1
+#define DATA_PIN PIN_NEOPIXEL
+CRGB leds[NUM_LEDS];
+#endif
+
 // #include <driver/rtc_io.h>
 
 #ifdef ARCH_ESP32
@@ -189,6 +199,14 @@ static int32_t ledBlinker()
 
     setLed(ledOn);
 
+#ifdef PIN_NEOPIXEL
+    if (ledOn)
+        leds[0] = CRGB::Green;
+    else
+        leds[0] = CRGB::Black;
+    FastLED.show();
+#endif
+
     // have a very sparse duty cycle of LED being on, unless charging, then blink 0.5Hz square wave rate to indicate that
     return powerStatus->getIsCharging() ? 1000 : (ledOn ? 1 : 1000);
 }
@@ -308,6 +326,10 @@ void setup()
 #endif
 
     OSThread::setup();
+
+#ifdef PIN_NEOPIXEL
+    FastLED.addLeds<WS2812B, DATA_PIN, GRB>(leds, NUM_LEDS);  // GRB ordering is typical
+#endif
 
     ledPeriodic = new Periodic("Blink", ledBlinker);
 

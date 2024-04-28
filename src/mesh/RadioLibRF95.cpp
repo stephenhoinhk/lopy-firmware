@@ -4,13 +4,21 @@
 // From datasheet but radiolib doesn't know anything about this
 #define SX127X_REG_TCXO 0x4B
 
+#ifdef USE_SX1272
+RadioLibRF95::RadioLibRF95(Module *mod) : SX1272(mod) {}
+#else
 RadioLibRF95::RadioLibRF95(Module *mod) : SX1278(mod) {}
+#endif
 
 int16_t RadioLibRF95::begin(float freq, float bw, uint8_t sf, uint8_t cr, uint8_t syncWord, int8_t power, uint16_t preambleLength,
                             uint8_t gain)
 {
     // execute common part
+#ifdef USE_SX1272
+    uint8_t rf95versions[1] = {0x22};
+#else
     uint8_t rf95versions[2] = {0x12, 0x11};
+#endif
     int16_t state = SX127x::begin(rf95versions, sizeof(rf95versions), syncWord, preambleLength);
     RADIOLIB_ASSERT(state);
 
